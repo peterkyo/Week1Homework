@@ -9,6 +9,15 @@
 <p>
     @Html.ActionLink("Create New", "Create")
 </p>
+
+<p></p>
+<b>客戶名稱關鍵字:</b>
+@using (Html.BeginForm("SearchByCustomerName", "客戶資料"))
+{
+    
+    @Html.TextBox("CustomerName",null, new { @class = "btn-info"})
+    <input type="submit" value="Search" class="btn btn=default" />
+}
 <table class="table">
     <tr>
         <th>

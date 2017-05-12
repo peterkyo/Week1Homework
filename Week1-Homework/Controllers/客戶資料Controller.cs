@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
+using System.Data.Entity.Validation;
 using System.Linq;
 using System.Net;
 using System.Web;
@@ -100,16 +101,28 @@ namespace Week1_Homework.Controllers
         // GET: 客戶資料/Delete/5
         public ActionResult Delete(int? id)
         {
-            if (id == null)
+            var s = db.客戶資料.Find(id);
+
+            //if (id == null)
+            //{
+            //    return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            //}
+            //客戶資料 客戶資料 = db.客戶資料.Find(id);
+            //if (客戶資料 == null)
+            //{
+            //    return HttpNotFound();
+            //}
+            s.is刪除 = true;
+
+            try
             {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                db.SaveChanges();
             }
-            客戶資料 客戶資料 = db.客戶資料.Find(id);
-            if (客戶資料 == null)
+            catch (DbEntityValidationException ex)
             {
-                return HttpNotFound();
+                throw ex;
             }
-            return View(客戶資料);
+            return RedirectToAction("Index");
         }
 
         // POST: 客戶資料/Delete/5
@@ -130,6 +143,25 @@ namespace Week1_Homework.Controllers
                 db.Dispose();
             }
             base.Dispose(disposing);
+        }
+
+        //reference:http://ithelp.ithome.com.tw/articles/10161571
+        public ActionResult SearchByCustomerName(string CustomerName)
+        {
+                using (Models.客戶資料Entities db = new 客戶資料Entities())
+                {
+                    var result = (from s in db.客戶資料
+                                  where s.客戶名稱.Contains(CustomerName) && s.is刪除 == false
+                                  select s).ToList();
+                    return View("Index", result);
+
+                }
+        }
+
+        public ActionResult 客戶關聯資料表()
+        {
+            var data = db.vw客戶關聯資料統計表.ToList();
+            return View(data);
         }
     }
 }

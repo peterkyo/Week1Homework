@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
+using System.Data.Entity.Validation;
 using System.Linq;
 using System.Net;
 using System.Web;
@@ -15,10 +16,15 @@ namespace Week1_Homework.Controllers
         private 客戶資料Entities db = new 客戶資料Entities();
 
         // GET: 客戶聯絡人
-        public ActionResult Index()
+        public ActionResult Index(bool is刪除 = false)
         {
-            var 客戶聯絡人 = db.客戶聯絡人.Include(客 => 客.客戶資料);
-            return View(客戶聯絡人.ToList());
+            var all = db.客戶聯絡人.AsQueryable();
+
+            var data = all
+                .Where(p => p.is刪除 == false)
+                .OrderByDescending(p => p.Id).Take(10);
+
+            return View(data);
         }
 
         // GET: 客戶聯絡人/Details/5
@@ -50,6 +56,8 @@ namespace Week1_Homework.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Create([Bind(Include = "Id,客戶Id,職稱,姓名,Email,手機,電話,is刪除")] 客戶聯絡人 客戶聯絡人)
         {
+
+
             if (ModelState.IsValid)
             {
                 db.客戶聯絡人.Add(客戶聯絡人);
@@ -97,16 +105,19 @@ namespace Week1_Homework.Controllers
         // GET: 客戶聯絡人/Delete/5
         public ActionResult Delete(int? id)
         {
-            if (id == null)
+            var s = db.客戶聯絡人.Find(id);
+
+            s.is刪除 = true;
+
+            try
             {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                db.SaveChanges();
             }
-            客戶聯絡人 客戶聯絡人 = db.客戶聯絡人.Find(id);
-            if (客戶聯絡人 == null)
+            catch (DbEntityValidationException ex)
             {
-                return HttpNotFound();
+                throw ex;
             }
-            return View(客戶聯絡人);
+            return RedirectToAction("Index");
         }
 
         // POST: 客戶聯絡人/Delete/5
@@ -127,6 +138,21 @@ namespace Week1_Homework.Controllers
                 db.Dispose();
             }
             base.Dispose(disposing);
+        }
+
+        public ActionResult SearchByCustomerContactName(string ContactName)
+        {
+            //var 客戶聯絡人 = db.客戶聯絡人.Include(客 => 客.客戶資料);
+            //return View(客戶聯絡人.ToList());
+
+            using (Models.客戶資料Entities db = new 客戶資料Entities())
+            {
+                var result = (from s in db.客戶聯絡人.Include(s => s.客戶資料)
+                where s.姓名.Contains(ContactName) && s.is刪除 == false
+                              select s).ToList();
+                return View("Index", result);
+
+            }
         }
     }
 }

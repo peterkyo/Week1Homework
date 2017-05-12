@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
+using System.Data.Entity.Validation;
 using System.Linq;
 using System.Net;
 using System.Web;
@@ -15,10 +16,15 @@ namespace Week1_Homework.Controllers
         private 客戶資料Entities db = new 客戶資料Entities();
 
         // GET: 客戶銀行資訊
-        public ActionResult Index()
+        public ActionResult Index(bool is刪除 = false)
         {
-            var 客戶銀行資訊 = db.客戶銀行資訊.Include(客 => 客.客戶資料);
-            return View(客戶銀行資訊.ToList());
+            var all = db.客戶銀行資訊.AsQueryable();
+
+            var data = all
+                .Where(p => p.is刪除 == false)
+                .OrderByDescending(p => p.Id).Take(10);
+
+            return View(data);
         }
 
         // GET: 客戶銀行資訊/Details/5
@@ -97,16 +103,19 @@ namespace Week1_Homework.Controllers
         // GET: 客戶銀行資訊/Delete/5
         public ActionResult Delete(int? id)
         {
-            if (id == null)
+            var s = db.客戶銀行資訊.Find(id);
+
+            s.is刪除 = true;
+
+            try
             {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                db.SaveChanges();
             }
-            客戶銀行資訊 客戶銀行資訊 = db.客戶銀行資訊.Find(id);
-            if (客戶銀行資訊 == null)
+            catch (DbEntityValidationException ex)
             {
-                return HttpNotFound();
+                throw ex;
             }
-            return View(客戶銀行資訊);
+            return RedirectToAction("Index");
         }
 
         // POST: 客戶銀行資訊/Delete/5
@@ -127,6 +136,18 @@ namespace Week1_Homework.Controllers
                 db.Dispose();
             }
             base.Dispose(disposing);
+        }
+
+        public ActionResult SearchByName(string CustomerName)
+        {
+            using (Models.客戶資料Entities db = new 客戶資料Entities())
+            {
+                var result = (from s in db.客戶銀行資訊.Include(s => s.客戶資料)
+                              where s.客戶資料.客戶名稱.Contains(CustomerName) && s.is刪除 == false
+                              select s).ToList();
+                return View("Index", result);
+
+            }
         }
     }
 }

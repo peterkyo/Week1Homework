@@ -9,6 +9,13 @@
 <p>
     @Html.ActionLink("Create New", "Create")
 </p>
+<b>客戶名稱關鍵字:</b>
+@using (Html.BeginForm("SearchByName", "客戶銀行資訊"))
+{
+
+    @Html.TextBox("CustomerName", null, new { @class = "btn-info" })
+    <input type="submit" value="Search" class="btn btn=default" />
+}
 <table class="table">
     <tr>
         <th>
@@ -26,9 +33,9 @@
         <th>
             @Html.DisplayNameFor(model => model.帳戶號碼)
         </th>
-        <th>
+        @*<th>
             @Html.DisplayNameFor(model => model.is刪除)
-        </th>
+        </th>*@
         <th>
             @Html.DisplayNameFor(model => model.客戶資料.客戶名稱)
         </th>
@@ -52,9 +59,9 @@
         <td>
             @Html.DisplayFor(modelItem => item.帳戶號碼)
         </td>
-        <td>
+        @*<td>
             @Html.DisplayFor(modelItem => item.is刪除)
-        </td>
+        </td>*@
         <td>
             @Html.DisplayFor(modelItem => item.客戶資料.客戶名稱)
         </td>

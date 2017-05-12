@@ -15,24 +15,28 @@ namespace Week1_Homework.Models
         public int Id { get; set; }
         
         [StringLength(50, ErrorMessage="欄位長度不得大於 50 個字元")]
-        [Required]
+        [Required(ErrorMessage = "請輸入客戶名稱")]
         public string 客戶名稱 { get; set; }
         
         [StringLength(8, ErrorMessage="欄位長度不得大於 8 個字元")]
-        [Required]
+        [Required(ErrorMessage = "請輸入統一編號")]
         public string 統一編號 { get; set; }
         
         [StringLength(50, ErrorMessage="欄位長度不得大於 50 個字元")]
-        [Required]
+        [Required(ErrorMessage = "請輸入電話")]
         public string 電話 { get; set; }
         
         [StringLength(50, ErrorMessage="欄位長度不得大於 50 個字元")]
+        [Required(ErrorMessage = "請輸入傳真")]
         public string 傳真 { get; set; }
         
         [StringLength(100, ErrorMessage="欄位長度不得大於 100 個字元")]
+        [Required(ErrorMessage = "請輸入地址")]
         public string 地址 { get; set; }
-        
+
+        [Required(ErrorMessage ="請輸入Email")]
         [StringLength(250, ErrorMessage="欄位長度不得大於 250 個字元")]
+        [EmailAddress(ErrorMessage = "不合法的Email格式")]
         public string Email { get; set; }
         [Required]
         public bool is刪除 { get; set; }
